@@ -26,9 +26,12 @@ namespace ProtonTest.Services
 
     public class User
     {
+        public int Id { get; set; }
         public string Username { get; set; }
         public string FullName { get; set; }
-        public ObservableCollection<TestResult> Results { get; set; } = new ObservableCollection<TestResult>();
+        public string PasswordHash { get; set; }
+        //public string FullName { get; set; }
+        //public ObservableCollection<TestResult> Results { get; set; } = new ObservableCollection<TestResult>();
     }
 
     public static class UserSession

@@ -102,13 +102,26 @@ namespace ProtonTest.Pages
         {
             var result = new TestResult
             {
+                UserId = UserSession.CurrentUser.Id,
                 TestTitle = _category.Title,
                 TotalQuestions = _category.Questions.Count,
                 CorrectAnswers = _correctCount,
                 DatePassed = DateTime.Now.ToString("dd.MM.yyyy HH:mm")
             };
 
-            UserSession.CurrentUser?.Results.Add(result);
+            using (ApplicationContext context = new())
+            {
+                try
+                {
+                    context.TestResults.Add(result);
+                    context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return;
+                }
+            }
 
             MessageBox.Show($"Тест завершен!\nПравильных ответов: {_correctCount} из {_category.Questions.Count} ({result.Percentage:F1}%)",
                             "Результат", MessageBoxButton.OK, MessageBoxImage.Information);

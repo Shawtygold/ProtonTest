@@ -85,13 +85,17 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="40,32" MaxWidth="1000">
-            <TextBlock Text="Доступные модули тестирования" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
-            <TextBlock Text="Выберите нужный раздел для прохождения аттестации" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,24"/>
+            <TextBlock Text="Доступные модули тестирования" FontSize="22" FontWeight="Bold" 
+                       Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+            <TextBlock Text="Выберите нужный раздел для прохождения аттестации" FontSize="14" 
+                       Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,24"/>
 
             <ItemsControl Name="CategoriesControl">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,16">
+                        <Border Background="{DynamicResource CardBgBrush}" BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1"
+                                CornerRadius="8" Padding="20" Margin="0,0,0,16">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -99,12 +103,16 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" Margin="0,0,20,0">
-                                    <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,6"/>
-                                    <TextBlock Text="{Binding Description}" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding Questions.Count, StringFormat={}Вопросов: {0}}" FontSize="12" Foreground="{DynamicResource AccentBrush}" Margin="0,8,0,0"/>
+                                    <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" 
+                                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,6"/>
+                                    <TextBlock Text="{Binding Description}" FontSize="13" 
+                                               Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Questions.Count, StringFormat={}Вопросов: {0}}" FontSize="12"
+                                               Foreground="{DynamicResource AccentBrush}" Margin="0,8,0,0"/>
                                 </StackPanel>
 
-                                <Button Grid.Column="1" Content="Начать тест" Style="{StaticResource CleanButtonStyle}" VerticalAlignment="Center" Tag="{Binding}" Click="StartTest_Click"/>
+                                <Button Grid.Column="1" Content="Начать тест" Style="{StaticResource CleanButtonStyle}"
+                                        VerticalAlignment="Center" Tag="{Binding}" Click="StartTest_Click"/>
                             </Grid>
                         </Border>
                     </DataTemplate>

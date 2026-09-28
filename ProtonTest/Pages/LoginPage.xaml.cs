@@ -46,11 +46,68 @@ namespace ProtonTest.Pages
                 return;
             }
 
-            UserSession.CurrentUser = new User
+            if (string.IsNullOrEmpty(PasswordBox.Text))
             {
-                Username = UsernameBox.Text,
-                FullName = _isRegisterMode && !string.IsNullOrWhiteSpace(FullNameBox.Text) ? FullNameBox.Text : UsernameBox.Text
-            };
+                MessageBox.Show("Введите пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (_isRegisterMode)
+            {
+                if (string.IsNullOrEmpty(FullNameBox.Text))
+                {
+                    MessageBox.Show("Введите ФИО", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(PasswordBox.Text);
+
+                User user = new () { Username = UsernameBox.Text, FullName = FullNameBox.Text, PasswordHash = hashedPassword };
+                try
+                {
+                    using (ApplicationContext context = new())
+                    {
+                        context.Users.Add(user);
+                        context.SaveChanges();
+                    }
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                UserSession.CurrentUser = user;
+            }
+            else
+            {
+                try
+                {
+                    using (ApplicationContext context = new())
+                    {
+                        User? dbUser = context.Users.FirstOrDefault(u => u.Username == UsernameBox.Text);
+
+                        if (dbUser == null)
+                        {
+                            MessageBox.Show("Пользователь с таким логином не найден в базе данных");
+                            return;
+                        }
+
+                        if (!BCrypt.Net.BCrypt.Verify(PasswordBox.Text, dbUser.PasswordHash))
+                        {
+                            MessageBox.Show("Неверный пароль");
+                            return;
+                        }
+
+                        UserSession.CurrentUser = dbUser;
+                    }        
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
 
             NavigationService?.Navigate(new DashboardPage());
         }

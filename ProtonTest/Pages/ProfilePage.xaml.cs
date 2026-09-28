@@ -33,7 +33,11 @@ namespace ProtonTest.Pages
             {
                 UserNameText.Text = UserSession.CurrentUser.FullName;
                 UserLoginText.Text = $"Табельный номер / Логин: {UserSession.CurrentUser.Username}";
-                ResultsDataGrid.ItemsSource = UserSession.CurrentUser.Results;
+
+                using (ApplicationContext context = new())
+                {
+                    ResultsDataGrid.ItemsSource = context.TestResults.Where(t => t.UserId == UserSession.CurrentUser.Id).ToList();
+                }
             }
         }
 

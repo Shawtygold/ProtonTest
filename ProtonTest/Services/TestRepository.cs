@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ProtonTest.Services
+﻿namespace ProtonTest.Services
 {
     public static class TestRepository
     {
