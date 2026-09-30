@@ -21,50 +21,54 @@ namespace ProtonTest.Pages
     /// </summary>
     public partial class TestProcessPage : Page
     {
-        private readonly TestCategory _category;
+        private readonly Test _test;
+        private readonly List<Question> _testQuestions;
         private int _currentIndex = 0;
         private int _correctCount = 0;
         private readonly List<int> _selectedAnswers = new List<int>();
 
-        public TestProcessPage(TestCategory category)
+        public TestProcessPage(Test test)
         {
             InitializeComponent();
-            _category = category;
-            CategoryTitleText.Text = _category.Title;
+            _test = test;
+            _testQuestions = TestRepository.GetQuestions(_test.Id);
+            CategoryTitleText.Text = _test.Title;
             DisplayQuestion();
         }
 
         private void DisplayQuestion()
         {
-            var q = _category.Questions[_currentIndex];
+            var options = TestRepository.GetOptions(_testQuestions[_currentIndex].Id);
+
+            var q = _testQuestions[_currentIndex];
             QuestionText.Text = q.QuestionText;
-            ProgressText.Text = $"Вопрос {_currentIndex + 1} из {_category.Questions.Count}";
-            TestProgressBar.Value = ((double)(_currentIndex + 1) / _category.Questions.Count) * 100;
+            ProgressText.Text = $"Вопрос {_currentIndex + 1} из {_testQuestions.Count}";
+            TestProgressBar.Value = ((double)(_currentIndex + 1) / _testQuestions.Count) * 100;
 
             OptionsContainer.Children.Clear();
 
-            for (int i = 0; i < q.Options.Count; i++)
+            for (int i = 0; i < options.Count; i++)
             {
-                var option = q.Options[i];
+                var option = options[i];
                 var rb = new RadioButton
                 {
-                    Content = option.Text,
+                    Content = option.OptionText,
                     Tag = i,
                     Margin = new Thickness(0, 0, 0, 12),
                     FontSize = 14
                 };
 
-                // Подключаем динамическое отслеживание ресурса темы
                 rb.SetResourceReference(Control.ForegroundProperty, "TextPrimaryBrush");
 
                 OptionsContainer.Children.Add(rb);
             }
 
-            NextBtn.Content = (_currentIndex == _category.Questions.Count - 1) ? "Завершить тест" : "Следующий вопрос";
+            NextBtn.Content = (_currentIndex == _testQuestions.Count - 1) ? "Завершить тест" : "Следующий вопрос";
         }
 
         private void Next_Click(object sender, RoutedEventArgs e)
         {
+            var options = TestRepository.GetOptions(_testQuestions[_currentIndex].Id);
             int selectedIndex = -1;
             for (int i = 0; i < OptionsContainer.Children.Count; i++)
             {
@@ -81,7 +85,7 @@ namespace ProtonTest.Pages
                 return;
             }
 
-            if (_category.Questions[_currentIndex].Options[selectedIndex].IsCorrect)
+            if (options[selectedIndex].IsCorrect)
             {
                 _correctCount++;
             }

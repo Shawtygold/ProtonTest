@@ -17,7 +17,6 @@ namespace ProtonTest.Services
 
             var newTheme = new ResourceDictionary { Source = new Uri(themePath, UriKind.Absolute) };
 
-            // Заменяем глобальные ресурсы приложения
             var appResources = Application.Current.Resources.MergedDictionaries;
             appResources.Clear();
             appResources.Add(newTheme);
@@ -30,8 +29,6 @@ namespace ProtonTest.Services
         public string Username { get; set; }
         public string FullName { get; set; }
         public string PasswordHash { get; set; }
-        //public string FullName { get; set; }
-        //public ObservableCollection<TestResult> Results { get; set; } = new ObservableCollection<TestResult>();
     }
 
     public static class UserSession

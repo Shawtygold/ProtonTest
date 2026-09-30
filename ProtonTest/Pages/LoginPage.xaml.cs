@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,7 +47,7 @@ namespace ProtonTest.Pages
                 return;
             }
 
-            if (string.IsNullOrEmpty(PasswordBox.Text))
+            if (string.IsNullOrEmpty(PasswordBox.Password))
             {
                 MessageBox.Show("Введите пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -54,15 +55,15 @@ namespace ProtonTest.Pages
 
             if (_isRegisterMode)
             {
-                if (string.IsNullOrEmpty(FullNameBox.Text))
+                if (string.IsNullOrEmpty(FullNameBox.Text) || !Regex.IsMatch(FullNameBox.Text, "^[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)*(?:\\s+[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)*){0,2}$"))
                 {
-                    MessageBox.Show("Введите ФИО", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Введите ФИО в формате: Иванов Иван Иванович", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(PasswordBox.Text);
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(PasswordBox.Password);
 
-                User user = new () { Username = UsernameBox.Text, FullName = FullNameBox.Text, PasswordHash = hashedPassword };
+                User user = new() { Username = UsernameBox.Text, FullName = FullNameBox.Text, PasswordHash = hashedPassword };
                 try
                 {
                     using (ApplicationContext context = new())
@@ -71,7 +72,7 @@ namespace ProtonTest.Pages
                         context.SaveChanges();
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
@@ -93,14 +94,14 @@ namespace ProtonTest.Pages
                             return;
                         }
 
-                        if (!BCrypt.Net.BCrypt.Verify(PasswordBox.Text, dbUser.PasswordHash))
+                        if (!BCrypt.Net.BCrypt.Verify(PasswordBox.Password, dbUser.PasswordHash))
                         {
                             MessageBox.Show("Неверный пароль");
                             return;
                         }
 
                         UserSession.CurrentUser = dbUser;
-                    }        
+                    }
                 }
                 catch (Exception ex)
                 {

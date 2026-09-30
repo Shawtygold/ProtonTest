@@ -1,7 +1,33 @@
-﻿namespace ProtonTest.Services
+﻿using System.Windows.Media.Animation;
+
+namespace ProtonTest.Services
 {
     public static class TestRepository
     {
+        public static List<Test> GetAllTests()
+        {
+            using (ApplicationContext context = new())
+            {
+                return context.Tests.ToList();
+            }
+        }
+
+        public static List<Question> GetQuestions(int testId)
+        {
+            using (ApplicationContext context = new())
+            {
+                return context.Questions.Where(q => q.TestId == testId).ToList();
+            }
+        }
+
+        public static List<Option> GetOptions(int questionId)
+        {
+            using (ApplicationContext context = new())
+            {
+                return context.Options.Where(o => o.QuestionId == questionId).ToList();
+            }
+        }
+
         public static List<TestCategory> GetCategories()
         {
             return new List<TestCategory>

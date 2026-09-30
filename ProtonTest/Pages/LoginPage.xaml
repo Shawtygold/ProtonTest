@@ -26,9 +26,9 @@
                          BorderThickness="1" Padding="10,8" Margin="0,0,0,16" Visibility="Collapsed"/>
 
                 <TextBlock Text="Пароль" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,6"/>
-                <TextBox Name="PasswordBox" Height="40" Background="{DynamicResource InputBgBrush}" 
-                         Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" 
-                         BorderThickness="1" Padding="10,8" Margin="0,0,0,16"/>
+                <PasswordBox Name="PasswordBox" Height="40" Background="{DynamicResource InputBgBrush}" 
+                             Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" 
+                             BorderThickness="1" Padding="10,8" Margin="0,0,0,16"/>
 
                 <Button Name="SubmitBtn" Content="Войти" Style="{StaticResource CleanButtonStyle}" Click="Submit_Click" Margin="0,8,0,12" Height="40"/>
 
