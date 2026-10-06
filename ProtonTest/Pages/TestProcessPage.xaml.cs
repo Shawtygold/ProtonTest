@@ -25,6 +25,8 @@ namespace ProtonTest.Pages
         private readonly List<Question> _testQuestions;
         private int _currentIndex = 0;
         private int _correctCount = 0;
+        private int _questionIndex = 0;
+        private int _questionCount = 0;
         private readonly List<int> _selectedAnswers = new List<int>();
 
         public TestProcessPage(Test test)
@@ -32,18 +34,20 @@ namespace ProtonTest.Pages
             InitializeComponent();
             _test = test;
             _testQuestions = TestRepository.GetQuestions(_test.Id);
+            _questionCount = _testQuestions.Count;
             CategoryTitleText.Text = _test.Title;
             DisplayQuestion();
         }
 
         private void DisplayQuestion()
         {
-            var options = TestRepository.GetOptions(_testQuestions[_currentIndex].Id);
+            _currentIndex = Random.Shared.Next(_testQuestions.Count - 1);
 
             var q = _testQuestions[_currentIndex];
+            var options = TestRepository.GetOptions(_testQuestions[_currentIndex].Id);
             QuestionText.Text = q.QuestionText;
-            ProgressText.Text = $"Вопрос {_currentIndex + 1} из {_testQuestions.Count}";
-            TestProgressBar.Value = ((double)(_currentIndex + 1) / _testQuestions.Count) * 100;
+            ProgressText.Text = $"Вопрос {_questionIndex + 1} из {_questionCount}";
+            TestProgressBar.Value = ((double)(_questionIndex + 1) / _questionCount) * 100;
 
             OptionsContainer.Children.Clear();
 
@@ -63,11 +67,19 @@ namespace ProtonTest.Pages
                 OptionsContainer.Children.Add(rb);
             }
 
-            NextBtn.Content = (_currentIndex == _testQuestions.Count - 1) ? "Завершить тест" : "Следующий вопрос";
+            _testQuestions.RemoveAt(_currentIndex);
+
+            NextBtn.Content = (_testQuestions.Count == 0) ? "Завершить тест" : "Следующий вопрос";
         }
 
         private void Next_Click(object sender, RoutedEventArgs e)
         {
+            if (_testQuestions.Count == 0)
+            {
+                FinishTest();
+                return;
+            }
+
             var options = TestRepository.GetOptions(_testQuestions[_currentIndex].Id);
             int selectedIndex = -1;
             for (int i = 0; i < OptionsContainer.Children.Count; i++)
@@ -90,9 +102,10 @@ namespace ProtonTest.Pages
                 _correctCount++;
             }
 
-            _currentIndex++;
+            //_currentIndex++;
+            _questionIndex++;
 
-            if (_currentIndex < _category.Questions.Count)
+            if (_testQuestions.Count != 0)
             {
                 DisplayQuestion();
             }
@@ -107,8 +120,8 @@ namespace ProtonTest.Pages
             var result = new TestResult
             {
                 UserId = UserSession.CurrentUser.Id,
-                TestTitle = _category.Title,
-                TotalQuestions = _category.Questions.Count,
+                TestTitle = _test.Title,
+                TotalQuestions = _questionCount,
                 CorrectAnswers = _correctCount,
                 DatePassed = DateTime.Now.ToString("dd.MM.yyyy HH:mm")
             };
@@ -127,7 +140,7 @@ namespace ProtonTest.Pages
                 }
             }
 
-            MessageBox.Show($"Тест завершен!\nПравильных ответов: {_correctCount} из {_category.Questions.Count} ({result.Percentage:F1}%)",
+            MessageBox.Show($"Тест завершен!\nПравильных ответов: {_correctCount} из {_questionCount} ({result.Percentage:F1}%)",
                             "Результат", MessageBoxButton.OK, MessageBoxImage.Information);
 
             NavigationService?.Navigate(new ProfilePage());

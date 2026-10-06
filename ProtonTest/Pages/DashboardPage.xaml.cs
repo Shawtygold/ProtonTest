@@ -24,14 +24,27 @@ namespace ProtonTest.Pages
         public DashboardPage()
         {
             InitializeComponent();
-            CategoriesControl.ItemsSource = TestRepository.GetCategories();
+
+            //TestRepository.FillDatabase();
+
+            CategoriesControl.ItemsSource = TestRepository.GetAllTests();
         }
 
         private void StartTest_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is TestCategory category)
+            if (sender is Button btn && btn.Tag is Test test)
             {
-                NavigationService?.Navigate(new TestProcessPage(category));
+                using (ApplicationContext context = new())
+                {
+                    var questionCount = context.Questions.Where(q => q.TestId == test.Id).Count();
+                    if (questionCount == 0)
+                    {
+                        MessageBox.Show("Тест еще не содержит вопросов. Попробуйте позже");
+                        return;
+                    }
+                }
+
+                NavigationService?.Navigate(new TestProcessPage(test));
             }
         }
     }
