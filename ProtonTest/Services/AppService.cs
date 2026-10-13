@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using ProtonTest.Models;
 using System.Windows;
 
 namespace ProtonTest.Services
@@ -21,14 +21,6 @@ namespace ProtonTest.Services
             appResources.Clear();
             appResources.Add(newTheme);
         }
-    }
-
-    public class User
-    {
-        public int Id { get; set; }
-        public string Username { get; set; }
-        public string FullName { get; set; }
-        public string PasswordHash { get; set; }
     }
 
     public static class UserSession

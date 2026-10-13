@@ -25,6 +25,9 @@
                          Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" 
                          BorderThickness="1" Padding="10,8" Margin="0,0,0,16" Visibility="Collapsed"/>
 
+                <TextBlock Name="DepartmentLabel" Text="Департамент" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,6" Visibility="Collapsed"/>
+                <ComboBox Name="DepartmentComboBox" Height="40" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Padding="10,8" Margin="0,0,0,16" DisplayMemberPath="Name" SelectedValuePath="Id" Visibility="Collapsed"/>
+
                 <TextBlock Text="Пароль" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,6"/>
                 <PasswordBox Name="PasswordBox" Height="40" Background="{DynamicResource InputBgBrush}" 
                              Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" 

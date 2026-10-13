@@ -1,12 +1,24 @@
-﻿namespace ProtonTest.Services
+﻿using Microsoft.EntityFrameworkCore;
+using ProtonTest.Models;
+using System.Diagnostics;
+
+namespace ProtonTest.Services
 {
     public static class TestRepository
     {
+        public static List<Test> GetTestsForDepartment(int departmentId)
+        {
+            using (ApplicationContext context = new())
+            {
+                return context.Tests.Include(x => x.Questions).Where(t => t.DepartmentId == departmentId).ToList();
+            }
+        }
+
         public static List<Test> GetAllTests()
         {
             using (ApplicationContext context = new())
             {
-                return context.Tests.ToList();
+                return context.Tests.Include(x => x.Questions).ToList();
             }
         }
 
@@ -32,25 +44,28 @@
             {
                 void AddQuestion(string questionText, int testId, params (string optionText, bool isCorrect)[] options)
                 {
-                    var question = new Question { QuestionText = questionText, TestId = testId };
+                    var question = new Question(testId, questionText);
                     context.Questions.Add(question);
                     context.SaveChanges(); 
 
                     foreach (var opt in options)
                     {
-                        context.Options.Add(new Option
-                        {
-                            QuestionId = question.Id,
-                            OptionText = opt.optionText,
-                            IsCorrect = opt.isCorrect
-                        });
+                        context.Options.Add(new Option(question.Id, opt.optionText, opt.isCorrect));
                     }
                 }
 
-                context.Tests.Add(new Test() { Title = "Пожарная безопасность", Description = "Проверка знаний правил пожарного режима, первичных средств тушения и эвакуации." });
-                context.Tests.Add(new Test() { Title = "Гражданская оборона (ГО)", Description = "Действия при чрезвычайных ситуациях, сигналы оповещения и применение СИЗ." });
-                context.Tests.Add(new Test() { Title = "Первая помощь", Description = "Оказание доврачебной помощи при травмах, ожогах и неотложных состояниях." });
-                context.Tests.Add(new Test() { Title = "Охрана труда", Description = "Требования охраны труда, инструктажи, СИЗ и расследование несчастных случаев." });
+                context.Users.Add(new User(1, 1, "admin", "Админ Админ Админ", BCrypt.Net.BCrypt.HashPassword("12345")));
+
+                context.Roles.Add(new Role("admin"));
+                context.Roles.Add(new Role("employee"));
+
+                context.Departments.Add(new Department("IT"));
+                context.Departments.Add(new Department("Test"));
+
+                context.Tests.Add(new Test(2,"Пожарная безопасность", "Проверка знаний правил пожарного режима, первичных средств тушения и эвакуации."));
+                context.Tests.Add(new Test(2,"Гражданская оборона (ГО)", "Действия при чрезвычайных ситуациях, сигналы оповещения и применение СИЗ."));
+                context.Tests.Add(new Test(2,"Первая помощь", "Оказание доврачебной помощи при травмах, ожогах и неотложных состояниях."));
+                context.Tests.Add(new Test(2,"Охрана труда", "Требования охраны труда, инструктажи, СИЗ и расследование несчастных случаев."));
                 context.SaveChanges(); 
 
                 // =========================================================

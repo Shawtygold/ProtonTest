@@ -1,4 +1,5 @@
-﻿using ProtonTest.Services;
+﻿using ProtonTest.Models;
+using ProtonTest.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +27,13 @@ namespace ProtonTest.Pages
             InitializeComponent();
 
             //TestRepository.FillDatabase();
-
-            CategoriesControl.ItemsSource = TestRepository.GetAllTests();
+            if (UserSession.CurrentUser.Role != null)
+            {
+                if (UserSession.CurrentUser.Role.Name == Constants.ADMIN_ROLE_NAME)
+                    CategoriesControl.ItemsSource = TestRepository.GetAllTests();
+                else if(UserSession.CurrentUser.Role.Name == Constants.EMPLOYEE_ROLE_NAME)
+                    CategoriesControl.ItemsSource = TestRepository.GetTestsForDepartment(UserSession.CurrentUser.DepartmentId);
+            }
         }
 
         private void StartTest_Click(object sender, RoutedEventArgs e)

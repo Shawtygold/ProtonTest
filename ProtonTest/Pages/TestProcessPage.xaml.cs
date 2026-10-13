@@ -1,18 +1,8 @@
-﻿using ProtonTest.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ProtonTest.Models;
+using ProtonTest.Services;
+using ProtonTest.Views;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProtonTest.Pages
 {
@@ -23,11 +13,10 @@ namespace ProtonTest.Pages
     {
         private readonly Test _test;
         private readonly List<Question> _testQuestions;
-        private int _currentIndex = 0;
+        private Question? _currentQuestion;
         private int _correctCount = 0;
         private int _questionIndex = 0;
         private int _questionCount = 0;
-        private readonly List<int> _selectedAnswers = new List<int>();
 
         public TestProcessPage(Test test)
         {
@@ -36,76 +25,80 @@ namespace ProtonTest.Pages
             _testQuestions = TestRepository.GetQuestions(_test.Id);
             _questionCount = _testQuestions.Count;
             CategoryTitleText.Text = _test.Title;
+
+            if (_questionCount == 0)
+            {
+                MessageBox.Show("В этом тесте еще нет вопросов.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             DisplayQuestion();
         }
 
         private void DisplayQuestion()
         {
-            _currentIndex = Random.Shared.Next(_testQuestions.Count - 1);
+            if (_testQuestions.Count == 0) return;
 
-            var q = _testQuestions[_currentIndex];
-            var options = TestRepository.GetOptions(_testQuestions[_currentIndex].Id);
-            QuestionText.Text = q.QuestionText;
+            // Выбираем случайный индекс из оставшихся вопросов
+            int index = Random.Shared.Next(_testQuestions.Count);
+            _currentQuestion = _testQuestions[index];
+
+            // Удаляем вопрос, чтобы он не повторился
+            _testQuestions.RemoveAt(index);
+
+            var options = TestRepository.GetOptions(_currentQuestion.Id);
+            QuestionText.Text = _currentQuestion.QuestionText;
             ProgressText.Text = $"Вопрос {_questionIndex + 1} из {_questionCount}";
             TestProgressBar.Value = ((double)(_questionIndex + 1) / _questionCount) * 100;
 
             OptionsContainer.Children.Clear();
 
-            for (int i = 0; i < options.Count; i++)
+            foreach (var option in options)
             {
-                var option = options[i];
                 var rb = new RadioButton
                 {
                     Content = option.OptionText,
-                    Tag = i,
+                    Tag = option, // Сохраняем сам объект Option прямо в Tag
                     Margin = new Thickness(0, 0, 0, 12),
                     FontSize = 14
                 };
 
                 rb.SetResourceReference(Control.ForegroundProperty, "TextPrimaryBrush");
-
                 OptionsContainer.Children.Add(rb);
             }
-
-            _testQuestions.RemoveAt(_currentIndex);
 
             NextBtn.Content = (_testQuestions.Count == 0) ? "Завершить тест" : "Следующий вопрос";
         }
 
         private void Next_Click(object sender, RoutedEventArgs e)
         {
-            if (_testQuestions.Count == 0)
+            // Ищем выбранный RadioButton
+            RadioButton? selectedRb = null;
+            foreach (var child in OptionsContainer.Children)
             {
-                FinishTest();
-                return;
-            }
-
-            var options = TestRepository.GetOptions(_testQuestions[_currentIndex].Id);
-            int selectedIndex = -1;
-            for (int i = 0; i < OptionsContainer.Children.Count; i++)
-            {
-                if (OptionsContainer.Children[i] is RadioButton rb && rb.IsChecked == true)
+                if (child is RadioButton rb && rb.IsChecked == true)
                 {
-                    selectedIndex = i;
+                    selectedRb = rb;
                     break;
                 }
             }
 
-            if (selectedIndex == -1)
+            if (selectedRb == null)
             {
                 MessageBox.Show("Пожалуйста, выберите вариант ответа.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            if (options[selectedIndex].IsCorrect)
+            // Проверяем правильность через сохраненный объект Option в Tag
+            if (selectedRb.Tag is Option selectedOption && selectedOption.IsCorrect)
             {
                 _correctCount++;
             }
 
-            //_currentIndex++;
             _questionIndex++;
 
-            if (_testQuestions.Count != 0)
+            // Если вопросы еще остались — показываем следующий, иначе завершаем тест
+            if (_testQuestions.Count > 0)
             {
                 DisplayQuestion();
             }
@@ -117,14 +110,7 @@ namespace ProtonTest.Pages
 
         private void FinishTest()
         {
-            var result = new TestResult
-            {
-                UserId = UserSession.CurrentUser.Id,
-                TestTitle = _test.Title,
-                TotalQuestions = _questionCount,
-                CorrectAnswers = _correctCount,
-                DatePassed = DateTime.Now.ToString("dd.MM.yyyy HH:mm")
-            };
+            var result = new TestResult(UserSession.CurrentUser.Id, _test.Id, _questionCount, _correctCount, DateTime.Now);
 
             using (ApplicationContext context = new())
             {
@@ -135,12 +121,14 @@ namespace ProtonTest.Pages
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
             }
 
-            MessageBox.Show($"Тест завершен!\nПравильных ответов: {_correctCount} из {_questionCount} ({result.Percentage:F1}%)",
+            var testResultView = new TestResultView(_test.Title, result.TotalQuestions, result.CorrectAnswers, result.DatePassed.ToString("dd.MM.yyyy HH:mm"));
+
+            MessageBox.Show($"Тест завершен!\nПравильных ответов: {_correctCount} из {_questionCount} ({testResultView.Percentage:F1}%)",
                             "Результат", MessageBoxButton.OK, MessageBoxImage.Information);
 
             NavigationService?.Navigate(new ProfilePage());

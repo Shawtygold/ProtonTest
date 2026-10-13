@@ -1,14 +1,6 @@
 ﻿using ProtonTest.Services;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProtonTest
 {
@@ -20,6 +12,8 @@ namespace ProtonTest
         public MainWindow()
         {
             InitializeComponent();
+           // TestRepository.FillDatabase();
+            //MainFrame.Navigate(new Pages.AdminTestsPage());
             MainFrame.Navigate(new Pages.LoginPage());
         }
 
@@ -28,11 +22,25 @@ namespace ProtonTest
             ThemeManager.ToggleTheme();
         }
 
+        private void AdminPanel_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new Pages.AdminTestsPage());
+        }
+
+
         public void UpdateHeaderState()
         {
             bool isLoggedIn = UserSession.CurrentUser != null;
+
+            if (isLoggedIn)
+            {
+                AdminPanelBtn.Visibility = UserSession.CurrentUser.RoleId == 1 ? Visibility.Visible : Visibility.Collapsed;
+            }
+
             ProfileNavBtn.Visibility = isLoggedIn ? Visibility.Visible : Visibility.Collapsed;
             LogoutBtn.Visibility = isLoggedIn ? Visibility.Visible : Visibility.Collapsed;
+            if (!isLoggedIn)
+                AdminPanelBtn.Visibility = Visibility.Collapsed;
         }
 
         private void ProfileNav_Click(object sender, RoutedEventArgs e)

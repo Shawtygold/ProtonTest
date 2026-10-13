@@ -1,4 +1,6 @@
-﻿using ProtonTest.Services;
+﻿using Microsoft.EntityFrameworkCore;
+using ProtonTest.Models;
+using ProtonTest.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +25,21 @@ namespace ProtonTest.Pages
     public partial class LoginPage : Page
     {
         private bool _isRegisterMode = false;
+        private const int _employeeRoleId = 2;
 
         public LoginPage()
         {
             InitializeComponent();
+        }
+
+        private void LoadDepartments()
+        {
+            using (ApplicationContext context = new())
+            {
+                DepartmentComboBox.ItemsSource = context.Departments.ToList();
+                if (DepartmentComboBox.Items.Count > 0)
+                    DepartmentComboBox.SelectedIndex = 0;
+            }
         }
 
         private void SwitchMode_Click(object sender, RoutedEventArgs e)
@@ -35,8 +48,18 @@ namespace ProtonTest.Pages
             TitleText.Text = _isRegisterMode ? "Регистрация" : "Вход в систему";
             FullNameLabel.Visibility = _isRegisterMode ? Visibility.Visible : Visibility.Collapsed;
             FullNameBox.Visibility = _isRegisterMode ? Visibility.Visible : Visibility.Collapsed;
+
+            // Управляем видимостью выбора департамента
+            DepartmentLabel.Visibility = _isRegisterMode ? Visibility.Visible : Visibility.Collapsed;
+            DepartmentComboBox.Visibility = _isRegisterMode ? Visibility.Visible : Visibility.Collapsed;
+
             SubmitBtn.Content = _isRegisterMode ? "Зарегистрироваться" : "Войти";
             SwitchModeBtn.Content = _isRegisterMode ? "Уже есть аккаунт? Войти" : "Нет аккаунта? Зарегистрироваться";
+
+            if (_isRegisterMode && DepartmentComboBox.ItemsSource == null)
+            {
+                LoadDepartments();
+            }
         }
 
         private void Submit_Click(object sender, RoutedEventArgs e)
@@ -61,15 +84,25 @@ namespace ProtonTest.Pages
                     return;
                 }
 
+                if (DepartmentComboBox.SelectedValue == null)
+                {
+                    MessageBox.Show("Выберите департамент", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                int selectedDepartmentId = (int)DepartmentComboBox.SelectedValue;
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(PasswordBox.Password);
 
-                User user = new() { Username = UsernameBox.Text, FullName = FullNameBox.Text, PasswordHash = hashedPassword };
+                // Создаем пользователя с выбранным департаментом
+                User user = new(_employeeRoleId, selectedDepartmentId, UsernameBox.Text, FullNameBox.Text, hashedPassword);
                 try
                 {
                     using (ApplicationContext context = new())
                     {
                         context.Users.Add(user);
                         context.SaveChanges();
+
+                        user = context.Users.Include(x => x.Department).Include(x => x.Role).FirstOrDefault(u => u.Id == user.Id);
                     }
                 }
                 catch (Exception ex)
@@ -86,7 +119,7 @@ namespace ProtonTest.Pages
                 {
                     using (ApplicationContext context = new())
                     {
-                        User? dbUser = context.Users.FirstOrDefault(u => u.Username == UsernameBox.Text);
+                        User? dbUser = context.Users.Include(x => x.Department).Include(x => x.Role).FirstOrDefault(u => u.Username == UsernameBox.Text);
 
                         if (dbUser == null)
                         {

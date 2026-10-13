@@ -71,6 +71,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Name="AdminPanelBtn" Content="Редактировать тесты" Style="{StaticResource OutlineButtonStyle}" Visibility="Collapsed" Click="AdminPanel_Click" Margin="0,0,12,0" Padding="12,6"/>
                     <Button Name="ThemeToggleBtn" Content="Тема" Style="{StaticResource OutlineButtonStyle}" Click="ThemeToggle_Click" Margin="0,0,12,0" Padding="12,6"/>
                     <Button Name="ProfileNavBtn" Content="Личный кабинет" Style="{StaticResource OutlineButtonStyle}" Click="ProfileNav_Click" Visibility="Collapsed" Margin="0,0,12,0" Padding="12,6"/>
                     <Button Name="LogoutBtn" Content="Выйти" Style="{StaticResource OutlineButtonStyle}" Click="Logout_Click" Visibility="Collapsed" Padding="12,6"/>

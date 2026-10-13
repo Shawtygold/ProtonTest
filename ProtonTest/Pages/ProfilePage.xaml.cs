@@ -1,18 +1,8 @@
-﻿using ProtonTest.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using ProtonTest.Services;
+using ProtonTest.Views;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ProtonTest.Pages
 {
@@ -36,7 +26,7 @@ namespace ProtonTest.Pages
 
                 using (ApplicationContext context = new())
                 {
-                    ResultsDataGrid.ItemsSource = context.TestResults.Where(t => t.UserId == UserSession.CurrentUser.Id).ToList();
+                    ResultsDataGrid.ItemsSource = context.TestResults.Include(t => t.Test).Where(t => t.UserId == UserSession.CurrentUser.Id).ToList().Select(tr => new TestResultView(tr.Test.Title, tr.TotalQuestions, tr.CorrectAnswers, tr.DatePassed.ToString("dd.MM.yyyy HH:mm")));
                 }
             }
         }
