@@ -31,8 +31,9 @@
             </StackPanel>
         </Border>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
-            <Button Name="NextBtn" Content="Следующий вопрос" Style="{StaticResource CleanButtonStyle}" Click="Next_Click"/>
-        </StackPanel>
+        <Grid Grid.Row="3" Margin="0,24,0,0">
+            <Button Name="BackBtn" Width="180" HorizontalAlignment="Left" Content="Назад к тестам" Style="{StaticResource OutlineButtonStyle}" Click="BackBtn_Click"/>
+            <Button Name="NextBtn" Width="180" HorizontalAlignment="Right" Content="Следующий вопрос" Style="{StaticResource CleanButtonStyle}" Click="Next_Click"/>
+        </Grid>
     </Grid>
 </Page>

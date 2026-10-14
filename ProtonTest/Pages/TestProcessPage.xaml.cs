@@ -39,11 +39,9 @@ namespace ProtonTest.Pages
         {
             if (_testQuestions.Count == 0) return;
 
-            // Выбираем случайный индекс из оставшихся вопросов
             int index = Random.Shared.Next(_testQuestions.Count);
             _currentQuestion = _testQuestions[index];
 
-            // Удаляем вопрос, чтобы он не повторился
             _testQuestions.RemoveAt(index);
 
             var options = TestRepository.GetOptions(_currentQuestion.Id);
@@ -58,7 +56,7 @@ namespace ProtonTest.Pages
                 var rb = new RadioButton
                 {
                     Content = option.OptionText,
-                    Tag = option, // Сохраняем сам объект Option прямо в Tag
+                    Tag = option,
                     Margin = new Thickness(0, 0, 0, 12),
                     FontSize = 14
                 };
@@ -72,7 +70,6 @@ namespace ProtonTest.Pages
 
         private void Next_Click(object sender, RoutedEventArgs e)
         {
-            // Ищем выбранный RadioButton
             RadioButton? selectedRb = null;
             foreach (var child in OptionsContainer.Children)
             {
@@ -89,7 +86,6 @@ namespace ProtonTest.Pages
                 return;
             }
 
-            // Проверяем правильность через сохраненный объект Option в Tag
             if (selectedRb.Tag is Option selectedOption && selectedOption.IsCorrect)
             {
                 _correctCount++;
@@ -97,7 +93,6 @@ namespace ProtonTest.Pages
 
             _questionIndex++;
 
-            // Если вопросы еще остались — показываем следующий, иначе завершаем тест
             if (_testQuestions.Count > 0)
             {
                 DisplayQuestion();
@@ -132,6 +127,11 @@ namespace ProtonTest.Pages
                             "Результат", MessageBoxButton.OK, MessageBoxImage.Information);
 
             NavigationService?.Navigate(new ProfilePage());
+        }
+
+        private void BackBtn_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService?.Navigate(new DashboardPage());
         }
     }
 }

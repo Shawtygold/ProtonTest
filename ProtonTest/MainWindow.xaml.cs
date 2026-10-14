@@ -13,7 +13,6 @@ namespace ProtonTest
         {
             InitializeComponent();
            // TestRepository.FillDatabase();
-            //MainFrame.Navigate(new Pages.AdminTestsPage());
             MainFrame.Navigate(new Pages.LoginPage());
         }
 
