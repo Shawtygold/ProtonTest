@@ -8,6 +8,80 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="AdminTestsPage">
     <Page.Resources>
+        <Style x:Key="CleanThumbStyle" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="thumbBorder" 
+                        Background="{DynamicResource TextSecondaryBrush}" 
+                        CornerRadius="3" 
+                        Opacity="0.3" 
+                        Margin="1"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="thumbBorder" Property="Opacity" Value="0.7" />
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="thumbBorder" Property="Opacity" Value="1.0" />
+                                <Setter TargetName="thumbBorder" Property="Background" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="InvisiblePageButtonStyle" TargetType="RepeatButton">
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Rectangle Fill="Transparent"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Stylus.IsPressAndHoldEnabled" Value="False"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="Width" Value="6"/>
+            <Setter Property="MinWidth" Value="6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid x:Name="Bg" SnapsToDevicePixels="True" Background="Transparent">
+                            <Track x:Name="PART_Track" IsDirectionReversed="True" IsEnabled="{TemplateBinding IsMouseOver}">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Style="{StaticResource InvisiblePageButtonStyle}"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource CleanThumbStyle}"/>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}" Style="{StaticResource InvisiblePageButtonStyle}"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Width" Value="Auto"/>
+                                <Setter Property="Height" Value="6"/>
+                                <Setter Property="MinHeight" Value="6"/>
+                                <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ScrollViewer">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
         <Style TargetType="ComboBoxItem">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
@@ -119,6 +193,45 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="CleanTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="{DynamicResource InputBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" 
+                    Background="{TemplateBinding Background}" 
+                    BorderBrush="{TemplateBinding BorderBrush}" 
+                    BorderThickness="{TemplateBinding BorderThickness}" 
+                    CornerRadius="8" 
+                    SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" 
+                              Focusable="False" 
+                              HorizontalScrollBarVisibility="Hidden" 
+                              VerticalScrollBarVisibility="Hidden"
+                              Margin="{TemplateBinding Padding}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="40,32" MaxWidth="900">
@@ -144,7 +257,7 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Margin="0,0,12,0">
                             <TextBlock Text="Название теста" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4"/>
-                            <TextBox Name="TestTitleBox" Height="34" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="8,6"/>
+                            <TextBox Style="{StaticResource CleanTextBoxStyle}" Name="TestTitleBox" Height="34" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="8,6"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1">
                             <TextBlock Text="Департамент" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4"/>
@@ -153,10 +266,10 @@
                     </Grid>
 
                     <TextBlock Text="Описание" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,4"/>
-                    <TextBox Name="TestDescBox" Height="50" TextWrapping="Wrap" AcceptsReturn="True" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="8,4" Margin="0,0,0,16"/>
+                    <TextBox Style="{StaticResource CleanTextBoxStyle}" Name="TestDescBox" Height="50" TextWrapping="Wrap" AcceptsReturn="True" Background="{DynamicResource InputBgBrush}" Foreground="{DynamicResource TextPrimaryBrush}" BorderBrush="{DynamicResource BorderBrush}" Padding="8,4" Margin="0,0,0,16"/>
 
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="Создать и перейти к вопросам" Style="{StaticResource CleanButtonStyle}" Click="CreateTest_Click" Margin="0,0,12,0" Height="32"/>
+                        <Button Content="Создать и перейти к вопросам" Padding="10,0" Style="{StaticResource CleanButtonStyle}" Click="CreateTest_Click" Margin="0,0,12,0" Height="32"/>
                         <Button Content="Очистить" Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}" BorderThickness="0" Click="ClearForm_Click" Cursor="Hand" Height="32"/>
                     </StackPanel>
                 </StackPanel>
@@ -177,9 +290,9 @@
                                         <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14"/>
                                         <TextBlock Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Content="Настроить вопросы" Style="{StaticResource CleanButtonStyle}" Tag="{Binding}" Click="OpenBuilder_Click" Margin="0,0,8,0" Height="28"/>
-                                        <Button Content="Удалить" Background="#FFE81123" Foreground="White" BorderThickness="0" Tag="{Binding}" Click="DeleteTest_Click" Cursor="Hand" Padding="10,4" Height="28"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+                                        <Button Content="Настроить вопросы" Padding="10,0" Style="{StaticResource CleanButtonStyle}" Tag="{Binding}" Click="OpenBuilder_Click" Margin="0,0,8,0" Height="28"/>
+                                        <Button Content="Удалить" Padding="10,0" Style="{StaticResource DeleteButtonStyle}" Background="#FFE81123" Foreground="White" BorderThickness="0" Tag="{Binding}" Click="DeleteTest_Click" Cursor="Hand" Height="28"/>
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>

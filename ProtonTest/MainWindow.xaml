@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProtonTest"
         mc:Ignorable="d"
-        Title="Протон-ПМ — Тестирование персонала" Height="700" Width="1050"
+        Title="Протон-ПМ — Тестирование персонала" Height="700" Width="1050" MinHeight="700" MinWidth="1050"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BgBrush}">
 
